@@ -1,123 +1,126 @@
-const _ = require('lodash/fp')
-const repo = require('../repo')
+"use strict";
 
-const defaultTypes = function(repoType) {
+var _ = require('lodash/fp');
+
+var repo = require('../repo');
+
+var defaultTypes = function (repoType) {
   return {
     blog: {
       symbol: '📝',
-      description: 'Blogposts',
+      description: 'Blogposts'
     },
     bug: {
       symbol: '🐛',
       description: 'Bug reports',
-      link: repo.getLinkToIssues(repoType),
+      link: repo.getLinkToIssues(repoType)
     },
     business: {
       symbol: '💼',
-      description: 'Business development',
+      description: 'Business development'
     },
     code: {
       symbol: '💻',
       description: 'Code',
-      link: repo.getLinkToCommits(repoType),
+      link: repo.getLinkToCommits(repoType)
     },
     content: {
       symbol: '🖋',
-      description: 'Content',
+      description: 'Content'
     },
     design: {
       symbol: '🎨',
-      description: 'Design',
+      description: 'Design'
     },
     doc: {
       symbol: '📖',
       description: 'Documentation',
-      link: repo.getLinkToCommits(repoType),
+      link: repo.getLinkToCommits(repoType)
     },
     eventOrganizing: {
       symbol: '📋',
-      description: 'Event Organizing',
+      description: 'Event Organizing'
     },
     example: {
       symbol: '💡',
-      description: 'Examples',
+      description: 'Examples'
     },
     financial: {
       symbol: '💵',
-      description: 'Financial',
+      description: 'Financial'
     },
     fundingFinding: {
       symbol: '🔍',
-      description: 'Funding Finding',
+      description: 'Funding Finding'
     },
     ideas: {
       symbol: '🤔',
-      description: 'Ideas, Planning, & Feedback',
+      description: 'Ideas, Planning, & Feedback'
     },
     infra: {
       symbol: '🚇',
-      description: 'Infrastructure (Hosting, Build-Tools, etc)',
+      description: 'Infrastructure (Hosting, Build-Tools, etc)'
     },
     maintenance: {
       symbol: '🚧',
-      description: 'Maintenance',
+      description: 'Maintenance'
     },
     platform: {
       symbol: '📦',
-      description: 'Packaging/porting to new platform',
+      description: 'Packaging/porting to new platform'
     },
     plugin: {
       symbol: '🔌',
-      description: 'Plugin/utility libraries',
+      description: 'Plugin/utility libraries'
     },
     projectManagement: {
       symbol: '📆',
-      description: 'Project Management',
+      description: 'Project Management'
     },
     question: {
       symbol: '💬',
-      description: 'Answering Questions',
+      description: 'Answering Questions'
     },
     review: {
       symbol: '👀',
-      description: 'Reviewed Pull Requests',
+      description: 'Reviewed Pull Requests'
     },
     security: {
       symbol: '🛡️',
-      description: 'Security',
+      description: 'Security'
     },
     talk: {
       symbol: '📢',
-      description: 'Talks',
+      description: 'Talks'
     },
     test: {
       symbol: '⚠️',
       description: 'Tests',
-      link: repo.getLinkToCommits(repoType),
+      link: repo.getLinkToCommits(repoType)
     },
     tool: {
       symbol: '🔧',
-      description: 'Tools',
+      description: 'Tools'
     },
     translation: {
       symbol: '🌍',
-      description: 'Translation',
+      description: 'Translation'
     },
     tutorial: {
       symbol: '✅',
-      description: 'Tutorials',
+      description: 'Tutorials'
     },
     userTesting: {
       symbol: '📓',
-      description: 'User Testing',
+      description: 'User Testing'
     },
     video: {
       symbol: '📹',
-      description: 'Videos',
-    },
-  }
-}
+      description: 'Videos'
+    }
+  };
+};
 
-module.exports = function(options) {
-  return _.assign(defaultTypes(options.repoType), options.types)
-}
+module.exports = function (options) {
+  return _.assign(defaultTypes(options.repoType), options.types);
+};

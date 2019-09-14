@@ -1,11 +1,13 @@
-const fs = require('fs')
+"use strict";
 
-module.exports = function ensureFileExists(file) {
-  return new Promise((resolve, reject) => {
-    if (fs.existsSync(file)) return resolve(file)
-    fs.writeFile(file, '', err => {
-      if (err) reject(err)
-      resolve(file)
-    })
-  })
-}
+var fs = require('fs');
+
+module.exports = function (file) {
+  return new Promise(function (resolve, reject) {
+    if (fs.existsSync(file)) return resolve(file);
+    fs.writeFile(file, '', function (err) {
+      if (err) reject(err);
+      resolve(file);
+    });
+  });
+};

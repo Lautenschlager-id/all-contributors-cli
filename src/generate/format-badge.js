@@ -1,10 +1,11 @@
-const _ = require('lodash/fp')
+"use strict";
 
-const defaultTemplate =
-  '[![All Contributors](https://img.shields.io/badge/all_contributors-<%= contributors.length %>-orange.svg?style=flat-square)](#contributors-)'
+var _ = require('lodash/fp');
 
-module.exports = function formatBadge(options, contributors) {
+var defaultTemplate = '[![All Contributors](https://img.shields.io/badge/all_contributors-<%= contributors.length %>-orange.svg?style=flat-square)](#contributors-)';
+
+module.exports = function (options, contributors) {
   return _.template(options.badgeTemplate || defaultTemplate)({
-    contributors,
-  })
-}
+    contributors
+  });
+};

@@ -1,111 +1,113 @@
-const pify = require('pify')
-const request = pify(require('request'))
+"use strict";
 
-function getRequestHeaders(optionalPrivateToken = '') {
-  const requestHeaders = {
-    'User-Agent': 'request',
+var pify = require('pify');
+
+var request = pify(require('request'));
+
+function getRequestHeaders(optionalPrivateToken) {
+  if (optionalPrivateToken === void 0) {
+    optionalPrivateToken = '';
   }
+
+  var requestHeaders = {
+    'User-Agent': 'request'
+  };
 
   if (optionalPrivateToken && optionalPrivateToken.length > 0) {
-    requestHeaders.Authorization = `token ${optionalPrivateToken}`
+    requestHeaders.Authorization = `token ${optionalPrivateToken}`;
   }
 
-  return requestHeaders
+  return requestHeaders;
 }
 
 function getNextLink(link) {
   if (!link) {
-    return null
+    return null;
   }
 
-  const nextLink = link.split(',').find(s => s.includes('rel="next"'))
+  var nextLink = link.split(',').find(function (s) {
+    return s.includes('rel="next"');
+  });
 
   if (!nextLink) {
-    return null
+    return null;
   }
 
-  return nextLink.split(';')[0].slice(1, -1)
+  return nextLink.split(';')[0].slice(1, -1);
 }
 
 function getContributorsPage(url, optionalPrivateToken) {
-  return request
-    .get({
-      url,
-      headers: getRequestHeaders(optionalPrivateToken),
-    })
-    .then(res => {
-      const body = JSON.parse(res.body)
-      if (res.statusCode >= 400) {
-        if (res.statusCode === 404) {
-          throw new Error('No contributors found on the GitHub repository')
-        }
-        throw new Error(body.message)
-      }
-      const contributorsIds = body.map(contributor => contributor.login)
+  return request.get({
+    url,
+    headers: getRequestHeaders(optionalPrivateToken)
+  }).then(function (res) {
+    var body = JSON.parse(res.body);
 
-      const nextLink = getNextLink(res.headers.link)
-      if (nextLink) {
-        return getContributorsPage(nextLink).then(nextContributors => {
-          return contributorsIds.concat(nextContributors)
-        })
+    if (res.statusCode >= 400) {
+      if (res.statusCode === 404) {
+        throw new Error('No contributors found on the GitHub repository');
       }
 
-      return contributorsIds
-    })
+      throw new Error(body.message);
+    }
+
+    var contributorsIds = body.map(function (contributor) {
+      return contributor.login;
+    });
+    var nextLink = getNextLink(res.headers.link);
+
+    if (nextLink) {
+      return getContributorsPage(nextLink).then(function (nextContributors) {
+        return contributorsIds.concat(nextContributors);
+      });
+    }
+
+    return contributorsIds;
+  });
 }
 
-const getUserInfo = function(username, hostname, optionalPrivateToken) {
+var getUserInfo = function (username, hostname, optionalPrivateToken) {
   /* eslint-disable complexity */
   if (!hostname) {
-    hostname = 'https://github.com'
+    hostname = 'https://github.com';
   }
 
   if (!username) {
-    throw new Error(
-      `No login when adding a contributor. Please specify a username.`,
-    )
+    throw new Error(`No login when adding a contributor. Please specify a username.`);
   }
 
-  const root = hostname.replace(/:\/\//, '://api.')
-  return request
-    .get({
-      url: `${root}/users/${username}`,
-      headers: getRequestHeaders(optionalPrivateToken),
-    })
-    .then(res => {
-      const body = JSON.parse(res.body)
+  var root = hostname.replace(/:\/\//, '://api.');
+  return request.get({
+    url: `${root}/users/${username}`,
+    headers: getRequestHeaders(optionalPrivateToken)
+  }).then(function (res) {
+    var body = JSON.parse(res.body);
+    var profile = body.blog || body.html_url; // Github throwing specific errors as 200...
 
-      let profile = body.blog || body.html_url
+    if (!profile && body.message) {
+      throw new Error(`Login not found when adding a contributor for username - ${username}.`);
+    }
 
-      // Github throwing specific errors as 200...
-      if (!profile && body.message) {
-        throw new Error(
-          `Login not found when adding a contributor for username - ${username}.`,
-        )
-      }
+    profile = profile.startsWith('http') ? profile : `http://${profile}`;
+    return {
+      login: body.login,
+      name: body.name || username,
+      avatar_url: body.avatar_url,
+      profile
+    };
+  });
+};
 
-      profile = profile.startsWith('http') ? profile : `http://${profile}`
-
-      return {
-        login: body.login,
-        name: body.name || username,
-        avatar_url: body.avatar_url,
-        profile,
-      }
-    })
-}
-
-const getContributors = function(owner, name, hostname, optionalPrivateToken) {
+var getContributors = function (owner, name, hostname, optionalPrivateToken) {
   if (!hostname) {
-    hostname = 'https://github.com'
+    hostname = 'https://github.com';
   }
 
-  const root = hostname.replace(/:\/\//, '://api.')
-  const url = `${root}/repos/${owner}/${name}/contributors?per_page=100`
-  return getContributorsPage(url, optionalPrivateToken)
-}
+  var root = hostname.replace(/:\/\//, '://api.');
+  return getContributorsPage(`${root}/repos/${owner}/${name}/contributors?per_page=100`, optionalPrivateToken);
+};
 
 module.exports = {
   getUserInfo,
-  getContributors,
-}
+  getContributors
+};

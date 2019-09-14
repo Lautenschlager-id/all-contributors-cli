@@ -1,59 +1,60 @@
-const _ = require('lodash/fp')
-const formatContributionType = require('./format-contribution-type')
+"use strict";
 
-const avatarTemplate = _.template(
-  '<img src="<%= contributor.avatar_url %>" width="<%= options.imageSize %>px;" alt="<%= name %>"/>',
-)
-const avatarBlockTemplate = _.template(
-  '<a href="<%= contributor.profile %>"><%= avatar %><br /><sub><b><%= name %></b></sub></a>',
-)
-const avatarBlockTemplateNoProfile = _.template(
-  '<%= avatar %><br /><sub><b><%= name %></b></sub>',
-)
-const contributorTemplate = _.template(
-  '<%= avatarBlock %><br /><%= contributions %>',
-)
+var _ = require('lodash/fp');
 
-const defaultImageSize = 100
+var formatContributionType = require('./format-contribution-type');
+
+var avatarTemplate = _.template('<img src="<%= contributor.avatar_url %>" width="<%= options.imageSize %>px;" alt="<%= name %>"/>');
+
+var avatarBlockTemplate = _.template('<a href="<%= contributor.profile %>"><%= avatar %><br /><sub><b><%= name %></b></sub></a>');
+
+var avatarBlockTemplateNoProfile = _.template('<%= avatar %><br /><sub><b><%= name %></b></sub>');
+
+var contributorTemplate = _.template('<%= avatarBlock %><br /><%= contributions %>');
+
+var defaultImageSize = 100;
 
 function defaultTemplate(templateData) {
-  const name = escapeName(templateData.contributor.name)
-  const avatar = avatarTemplate(
-    _.assign(templateData, {
-      name,
-    }),
-  )
-  const avatarBlockTemplateData = _.assign(
-    {
-      name,
-      avatar,
-    },
-    templateData,
-  )
-  let avatarBlock = null
+  var name = escapeName(templateData.contributor.name);
+  var avatar = avatarTemplate(_.assign(templateData, {
+    name
+  }));
+
+  var avatarBlockTemplateData = _.assign({
+    name,
+    avatar
+  }, templateData);
+
+  var avatarBlock = null;
 
   if (templateData.contributor.profile) {
-    avatarBlock = avatarBlockTemplate(avatarBlockTemplateData)
+    avatarBlock = avatarBlockTemplate(avatarBlockTemplateData);
   } else {
-    avatarBlock = avatarBlockTemplateNoProfile(avatarBlockTemplateData)
+    avatarBlock = avatarBlockTemplateNoProfile(avatarBlockTemplateData);
   }
 
-  return contributorTemplate(_.assign({avatarBlock}, templateData))
+  return contributorTemplate(_.assign({
+    avatarBlock
+  }, templateData));
 }
 
 function escapeName(name) {
-  return name.replace(new RegExp('\\|', 'g'), '&#124;')
+  return name.replace(new RegExp('\\|', 'g'), '&#124;');
 }
 
-module.exports = function formatContributor(options, contributor) {
-  const formatter = _.partial(formatContributionType, [options, contributor])
-  const contributions = contributor.contributions.map(formatter).join(' ')
-  const templateData = {
+module.exports = function (options, contributor) {
+  var formatter = _.partial(formatContributionType, [options, contributor]);
+
+  var contributions = contributor.contributions.map(formatter).join(' ');
+  var templateData = {
     contributions,
     contributor,
-    options: _.assign({imageSize: defaultImageSize}, options),
-  }
-  const customTemplate =
-    options.contributorTemplate && _.template(options.contributorTemplate)
-  return (customTemplate || defaultTemplate)(templateData)
-}
+    options: _.assign({
+      imageSize: defaultImageSize
+    }, options)
+  };
+
+  var customTemplate = options.contributorTemplate && _.template(options.contributorTemplate);
+
+  return (customTemplate || defaultTemplate)(templateData);
+};
